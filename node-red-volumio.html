@@ -1,0 +1,126 @@
+<script type="text/javascript">
+  RED.nodes.registerType('volumio event',{
+    category: 'input',
+    color: '#93abc3',
+    defaults: {
+      server: { value: '', type: 'volumio-server' },
+      event: { value: 'pushState', required:true}
+    },
+    inputs: 0,
+    outputs: 1,
+    icon: 'bridge.png',
+    label: function() {
+      return this.name || 'volumio event';
+    },
+    align: 'left'
+  });
+</script>
+
+<script type="text/x-red" data-template-name="volumio event">
+    <div class="form-row">
+        <label for="node-input-server"><i class="icon-tag"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-event"><i class="icon-tag"></i> Event</label>
+        <input type="text" id="node-input-event">
+    </div>
+    <div class="form-tips">
+      <b>Tip:</b> Volumio WebSocket event names can be found here (https://volumio.github.io/docs/API/WebSocket_APIs.html)
+      <p>some examples: </p>
+      <ul>
+          <li>pushState</li>
+          <li>connect</li>
+          <li>error</li>
+          <li>disconnect</li>
+          <li>pushState</li>
+          <li>pushQueue</li>
+          <li>getState</li>
+          <li>search</li>
+          <li>pushBrowseLibrary</li>
+          <li>getBrowseSources</li>
+          <li>pushMultiRoomDevices</li>
+      </ul>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="volumio event">
+    <p>Listen to Volumio2 WebSocket events (https://volumio.github.io/docs/API/WebSocket_APIs.html)</p>
+
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object|string</span></dt>
+        <dd> Volumio event data</dd>
+    </dl>
+
+</p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('volumio command',{
+    category: 'input',
+    color: '#93abc3',
+    defaults: {
+      server: { value: '', type: 'volumio-server' }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: 'bridge.png',
+    label: function() {
+      return this.name || 'volumio command';
+    },
+    align: 'left'
+  });
+</script>
+
+<script type="text/x-red" data-template-name="volumio command">
+    <div class="form-row">
+        <label for="node-input-server"><i class="icon-tag"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="volumio command">
+  <p>Emit events to Volumio2 WebSocket APIs (https://volumio.github.io/docs/API/WebSocket_APIs.html)</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload.event<span class="property-type">string</span>
+        </dt>
+        <dd> The event name to emit</dd>
+        <dt>payload.data<span class="property-type">string|object</span>
+        </dt>
+        <dd> The event data</dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object|string</span></dt>
+        <dd> Volumio event data</dd>
+    </dl>
+
+</p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('volumio-server',{
+    category: 'config',
+    defaults: {
+      host: { value:'', required: true },
+      port: { value: 3000, required: true, validate: RED.validators.number() }
+    },
+    label: function() {
+        return this.host + ':' + this.port ;
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="volumio-server">
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="icon-tag"></i> Host</label>
+        <input type="text" id="node-config-input-host" placeholder="host">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="icon-tag"></i> Port</label>
+        <input type="text" id="node-config-input-port" placeholder="port">
+    </div>
+</script>
