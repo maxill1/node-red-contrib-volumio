@@ -131,7 +131,7 @@ function VolumioCommand(config) {
     node.host = config.host;
     node.port = config.port;
 
-    var volumio = new VolumioWebsocket("192.168.1.104", 3000);
+    var volumio = new VolumioWebsocket(node.host, node.port);
     volumio.connect();
 
     config.volumio = volumio;
