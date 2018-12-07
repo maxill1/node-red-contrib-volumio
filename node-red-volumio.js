@@ -89,28 +89,51 @@ function VolumioCommand(config) {
               handleError(node, "Please provide an event name in msg.payload.event");
               return;
             }
-
-            var volumio = node.serverConfig.volumio;
-            var eventDescription = volumio.getEventDescription(eventName);
+            //optional
+            var pushEventName = msg.payload.pushEvent;
             var data;
-            if(eventDescription && eventDescription.data && msg.payload.data){
-              data = eventDescription.data(msg.payload.data);
-            }else{
-                handleError(node, "Event not handled: "+eventName);
-                return;
-            }
-            console.log("waiting on event "+eventDescription.pushEvent);
-            var callback = function (results) {
-              nodeStatus(node, parseStatus(eventDescription.pushEvent, results));
-              node.send({payload: results});
-              //avoid ghost listeners
-              volumio.socket.removeListener(eventDescription.pushEvent, callback);
-            };
 
-            volumio.socket.on(eventDescription.pushEvent, callback);
+            //data
+            if(msg.payload.data && msg.payload.data !== null && typeof msg.payload.data === 'object'){
+              data = msg.payload.data;
+            }
+
+            //volumio instance
+            var volumio = node.serverConfig.volumio;
+
+            //known events
+            var eventDescription = volumio.getEventDescription(eventName);
+            if(eventDescription){
+              //data with premapped function
+              if(!data && eventDescription.data && msg.payload.data){
+                data = eventDescription.data(msg.payload.data);
+              }
+              //premapped push event
+              if(!pushEventName){
+                pushEventName = eventDescription.pushEvent;
+              }
+            }
+
+            //no event
+            var reqMsg = eventName;
+            if(!pushEventName){
+                console.log("No event to listen after " +pushEvent);
+                reqMsg = eventName + "/no pushEvent";
+            }else{
+              console.log("waiting on event "+pushEventName);
+              reqMsg = eventName+"/"+pushEventName;
+              var callback = function (results) {
+                nodeStatus(node, parseStatus(pushEventName, results));
+                node.send({payload: results});
+                //avoid ghost listeners
+                volumio.socket.removeListener(pushEventName, callback);
+              };
+
+              volumio.socket.on(pushEventName, callback);
+            }
 
             volumio.command(eventName, data);
-            nodeStatus(node, "Requested "+eventName + "(data :"+JSON.stringify(data)+")");
+            nodeStatus(node, "Requested "+ reqMsg + " (data :"+JSON.stringify(data)+")");
 
         } catch (e) {
           handleError(node, e);
@@ -145,7 +168,12 @@ function VolumioCommand(config) {
       console.log("Volumio "+node.host+":"+node.port +" disconnect" );
     });
     volumio.socket.on("error", function(data){
-        console.log("Error on Volumio "+JSON.stringify(data));
+      var errData = "";
+      try {
+        errData = JSON.stringify(data);
+      } catch (e) {
+      }
+        console.log("Error on Volumio "+errData);
     });
   /* volumio..on("getState", function(data){
         console.log("getState "+JSON.stringify(data));

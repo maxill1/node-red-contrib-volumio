@@ -53,7 +53,6 @@
         <dd> Volumio event data</dd>
     </dl>
 
-</p>
 </script>
 
 <script type="text/javascript">
@@ -81,7 +80,10 @@
 </script>
 
 <script type="text/x-red" data-help-name="volumio command">
-  <p>Emit events to Volumio2 WebSocket APIs (https://volumio.github.io/docs/API/WebSocket_APIs.html)</p>
+  <p>emit a specific command and listen on the corresponding event pushing out the response</p>
+
+  <p>more info on event, data and push event <a href="https://volumio.github.io/docs/API/WebSocket_APIs.html">here</a></p>
+
     <h3>Inputs</h3>
     <dl class="message-properties">
         <dt>payload.event<span class="property-type">string</span>
@@ -90,7 +92,32 @@
         <dt>payload.data<span class="property-type">string|object</span>
         </dt>
         <dd> The event data</dd>
+        <dt>payload.pushEvent<span class="property-type">string (optional)</span>
+        </dt>
+        <dd> The push event name to listen on</dd>
     </dl>
+    <p>some events are pre-mapped and the node will listen on the following list of event ==> pushEvent: </p>
+    <ul>
+      <li>play ==> pushState</li>
+      <li>pause ==> pushState</li>
+      <li>prev ==> pushState</li>
+      <li>next ==> getSpushStatetate</li>
+      <li>setRepeat ==> pushState</li>
+      <li>setRandom ==> pushState</li>
+      <li>volume ==> pushState</li>
+      <li>mute ==> pushState</li>
+      <li>unmute ==> pushState</li>
+      <li>getQueue ==> pushQueue</li>
+      <li>playPlaylist ==> pushQueue</li>
+      <li>playFavourites ==> pushQueue</li>
+      <li>addToQueue ==> pushState</li>
+      <li>getState ==> pushState</li>
+      <li>getBrowseSources ==> pushBrowseSources</li>
+      <li>browseLibrary ==> pushBrowseLibrary</li>
+      <li>getMultiRoomDevices ==> pushMultiRoomDevices</li>
+      <li>search ==> pushBrowseLibrary</li>
+  </ul>
+  <p>however payload.pushEvent will win over internal mapping</p>
 
     <h3>Outputs</h3>
     <dl class="message-properties">
@@ -98,7 +125,7 @@
         <dd> Volumio event data</dd>
     </dl>
 
-</p>
+
 </script>
 
 <script type="text/javascript">
