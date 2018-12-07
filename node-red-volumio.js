@@ -93,16 +93,24 @@ function VolumioCommand(config) {
             var volumio = node.serverConfig.volumio;
             var eventDescription = volumio.getEventDescription(eventName);
             var data;
-            if(eventDescription.data && msg.payload.data){
+            if(eventDescription && eventDescription.data && msg.payload.data){
               data = eventDescription.data(msg.payload.data);
+            }else{
+                handleError(node, "Event not handled: "+eventName);
+                return;
             }
             console.log("waiting on event "+eventDescription.pushEvent);
-            volumio.socket.on(eventDescription.pushEvent, function (results) {
+            var callback = function (results) {
               nodeStatus(node, parseStatus(eventDescription.pushEvent, results));
               node.send({payload: results});
-            });
+              //avoid ghost listeners
+              volumio.socket.removeListener(eventDescription.pushEvent, callback);
+            };
+
+            volumio.socket.on(eventDescription.pushEvent, callback);
 
             volumio.command(eventName, data);
+            nodeStatus(node, "Requested "+eventName + "(data :"+JSON.stringify(data)+")");
 
         } catch (e) {
           handleError(node, e);

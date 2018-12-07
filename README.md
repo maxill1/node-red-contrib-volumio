@@ -1,6 +1,6 @@
 node-red-contrib-volumio
 
-a websocket client to connect and control volumio2
+a websocket client to connect and control volumio2 in node-red
 
 ## nodes
 
