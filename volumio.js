@@ -31,7 +31,13 @@ function VolumioWebsocket(host, port){
 
       self.connect = function(){
         console.log("Connecting to "+url);
-        self.socket = io.connect(url);
+        self.socket = io.connect(url, {
+          reconnection: true,
+          reconnectionAttempts: Infinity,
+          reconnectionDelay: 2000,
+          reconnectionDelayMax: 10000,
+          timeout: 10000
+        });
         console.log("ok "+url);
       };
 

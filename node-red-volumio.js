@@ -163,9 +163,25 @@ function VolumioCommand(config) {
     //events
     volumio.socket.on("connect", function(data){
       console.log("Volumio "+node.host+":"+node.port +" connected" );
+      // 'connect' fires on initial connect AND every reconnect; ask Volumio to
+      // re-push its state so the flow re-syncs after the device power-cycles.
+      try {
+        volumio.socket.emit("getState");
+      } catch (e) {
+        console.log("Volumio getState emit failed "+e.message);
+      }
     });
-    volumio.socket.on("disconnect", function(){
-      console.log("Volumio "+node.host+":"+node.port +" disconnect" );
+    volumio.socket.on("disconnect", function(reason){
+      console.log("Volumio "+node.host+":"+node.port +" disconnect: "+reason );
+      // socket.io v2 does not auto-reconnect on a server-initiated disconnect
+      // (what a Volumio reboot/shutdown usually is) - re-arm it manually.
+      if (reason === "io server disconnect") {
+        try {
+          volumio.socket.connect();
+        } catch (e) {
+          console.log("Volumio manual reconnect failed "+e.message);
+        }
+      }
     });
     volumio.socket.on("error", function(data){
       var errData = "";
